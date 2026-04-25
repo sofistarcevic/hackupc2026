@@ -2,8 +2,8 @@
 
 FILL_THRESHOLD = 80  # percentatge a partir del qual cal recollir
 
-# Distàncies de referència (ajusta-les al teu sensor real)
-EMPTY_DISTANCE_CM = 30
+# Distàncies de referència
+EMPTY_DISTANCE_CM = 140
 FULL_DISTANCE_CM = 5
 
 
