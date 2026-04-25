@@ -2,6 +2,7 @@ import json
 import os
 import traceback
 import threading
+import time
 #import cv2
 
 from arduino.app_utils import App, Bridge
@@ -17,14 +18,38 @@ ui = WebUI(assets_dir_path=_ui_dir)                                             
 state = {"temperature": 0.0, "humidity": 0.0, "time": "", "diffuser_state": 0, "heatwave_alert": False, "person_detection": False}
 
 
-
+#PART DE LA CAMARA
+last_seen_time = 0
+TIMEOUT_PERSON = 1.0
 
 video_detector = VideoObjectDetection(confidence=0.4, debounce_sec=1.5)
 
 def on_person_detected():
-    print("Person detected!")
+    global last_seen_time
+    last_seen_time = time.time()
+
+    if not state["person_detection"]:
+        print("🚨 Person detected!")
+        state["person_detection"] = True
+        ui.send_message("state_update", state)
+        
         
 video_detector.on_detect("person", on_person_detected)
+
+def check_person_timeout():
+    global last_seen_time
+    while True:
+        if state["person_detection"] and (time.time() - last_seen_time > TIMEOUT_PERSON):
+            print("Empty room.")
+            state["person_detection"] = False
+            ui.send_message("state_update", state)
+        
+        time.sleep(1)
+
+threading.Thread(target=check_person_timeout, daemon=True).start()
+threading.Thread(target=video_detector.start, daemon=True).start()
+
+
 
 
 
@@ -58,7 +83,7 @@ def on_sensor_reading(temperature: float, humidity: float):
     import threading
 
     def update_led():
-        if diffuser_state == 1:
+        if diffuser_state == 1 and state["person_detection"]:
             Bridge.call("set_pixel", 0, 255, 255, 0, 50)   #amarillo con brightness medio
         elif diffuser_state == 2:
             Bridge.call("set_pixel", 0, 255, 0, 0, 100)    #rojo con brightness màximo
