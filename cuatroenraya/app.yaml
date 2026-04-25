@@ -1,0 +1,6 @@
+name: cuatroenraya
+description: Live temperature and humidity dashboard powered by the Modulino Thermo sensor.
+ports: []
+bricks:
+- arduino:web_ui: {}
+icon: ♻️
