@@ -1,38 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modulino Thermo – Climate Monitor</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuatro en Raya</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>🌡️ Modulino Thermo – Climate Monitor</h1>
-    <span id="status" class="status connecting">Connecting…</span>
-  </header>
+    <header>
+        <h1>INSERTAR TITULO AQUI</h1>
+        
+        <nav class="pestanas">
+            <button class="pestana activa" onclick="cambiarPestana('PLANTS', this)">PLANTS</button>
+            <button class="pestana " onclick="cambiarPestana('DATA', this)">DATA</button>
+        </nav>
+    </header>
 
-  <main>
-    <div class="readings-grid">
-      <section class="card reading-card">
-        <div class="reading-icon">🌡️</div>
-        <div class="reading-label">Temperature</div>
-        <div class="reading-value" id="temperature">—</div>
-        <div class="reading-unit">°C</div>
-      </section>
+    <main>
+        <section id="PLANTS" class="contenido-pestana activa">
+            <h2>insertar titulo plants</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas, voluptate.</p>
+        </section>
 
-      <section class="card reading-card">
-        <div class="reading-icon">💧</div>
-        <div class="reading-label">Humidity</div>
-        <div class="reading-value" id="humidity">—</div>
-        <div class="reading-unit">%RH</div>
-      </section>
-    </div>
+        <section id="DATA" class="contenido-pestana ">
+            <h2 id="estado-conexion">Desconectado</h2>
+            <div class="panel-data-Temperatura">
+                
+                <div class="contenedor-grafica">
+                     <canvas id="graficaTemperatura"></canvas>
+                </div>
 
-    <p class="last-updated">Last updated: <span id="last-updated">—</span></p>
-  </main>
+                <div class="mustreo-actual">
+                    <h3>DATO ACTUAL</h3>
+                    <div class="valor-gigante">
+                        <span id="temp-actual-display">--</span><span class="unidad">°C</span>
+                    </div>
+                </div>
 
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script src="app.js"></script>
+            </div>
+
+            <div class="panel-data-Humedad">
+                
+                <div class="contenedor-grafica">
+                     <canvas id="graficaHumedad"></canvas>
+                </div>
+
+                <div class="display-actual">
+                    <h3>DATO ACTUAL</h3>
+                    <div class="valor-gigante">
+                        <span id="humedad-actual-display">--</span><span class="unidad">%</span>
+                    </div>
+                </div>
+
+            </div>
+            </section>
+    </main>
+
+    <script src="app.js"></script>
 </body>
 </html>
