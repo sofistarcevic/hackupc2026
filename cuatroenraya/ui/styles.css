@@ -175,6 +175,10 @@ h1 {
 .status-ok { background-color: #2ecc71; }
 .status-warning { background-color: #f1c40f; }
 .status-critical { background-color: #e74c3c; }
+.status-loading { 
+    background-color: #bdc3c7; 
+    color: #7f8c8d; 
+}
 
 /* Filtros para marcadores Leaflet */
 .pin-activo { filter: hue-rotate(120deg) brightness(1.2); }
