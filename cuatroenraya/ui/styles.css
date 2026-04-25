@@ -1,117 +1,112 @@
-:root {
-  --bg:      #0f1117;
-  --surface: #1c1f2a;
-  --border:  #2e3244;
-  --accent:  #4fa3e0;
-  --text:    #e2e8f0;
-  --muted:   #8892a4;
-  --green:   #22c55e;
-  --red:     #ef4444;
-  --radius:  10px;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    overflow-y: scroll;
 }
 
 header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
+    background-color: #186311;
+    color: white;
+    text-align: right;
+    padding: 20px 20px 0 20px;
 }
 
-header h1 { font-size: 1.35rem; letter-spacing: -0.02em; }
-
-.status {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+h1 {
+    margin: 0;
+    padding-top: 10px;
+    padding-bottom: 40px;
 }
 
-.status.connected    { background: var(--green); color: #fff; }
-.status.disconnected { background: var(--red);   color: #fff; }
-.status.connecting   { background: var(--muted); color: #fff; }
-
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
+.pestanas {
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+    margin: 0;
+    padding-left: 20px;
 }
 
-/* Two-column grid for reading cards */
-.readings-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  width: 100%;
+.pestana {
+    background-color: #08310a;
+    color: #bdc3c7;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 10px 10px 0 0; 
+    transition: all 0.3s ease;
 }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem 1.5rem;
+.pestana:hover {
+    background-color: #08310a;
+    color: white;
 }
 
-/* Reading card layout */
-.reading-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  text-align: center;
+.pestana.activa {
+    background-color: #f4f7f6; 
+    color: #215f24;
 }
 
-.reading-icon  { font-size: 2rem; }
-
-.reading-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.contenido-pestana {
+    display: none !important;
+    padding: 40px;
+    text-align: center;
 }
 
-.reading-value {
-  font-size: 3rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent);
-  line-height: 1;
+.contenido-pestana.activa {
+    display: block !important;
 }
 
-.reading-unit {
-  font-size: 1rem;
-  color: var(--muted);
+.panel-data-Temperatura,
+.panel-data-Humedad {
+    display: grid;
+    grid-template-columns: 1fr 250px; 
+    gap: 20px;
+    align-items: center;
+    max-width: 1000px;
+    margin: 20px auto;
 }
 
-/* Last updated */
-.last-updated {
-  font-size: 0.8rem;
-  color: var(--muted);
-  text-align: center;
+.contenedor-grafica {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%; 
+    min-width: 0; 
 }
 
-.last-updated span { color: var(--text); }
-
-/* Narrow screens: stack cards */
-@media (max-width: 400px) {
-  .readings-grid { grid-template-columns: 1fr; }
+.mustreo-actual,
+.display-actual {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%; 
+    box-sizing: border-box;
 }
 
-@media (min-width: 600px) {
-  main { max-width: 700px; margin: 0 auto; }
+.mustreo-actual h3,
+.display-actual h3 {
+    margin-top: 0;
+    color: #215f24; 
+    font-size: 1.2rem;
+}
+
+.valor-gigante {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #08310a; 
+}
+
+.valor-gigante .unidad {
+    font-size: 1.5rem;
+    color: #95a5a6;
 }
