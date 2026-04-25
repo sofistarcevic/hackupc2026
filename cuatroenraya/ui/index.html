@@ -15,17 +15,13 @@
         <h1>INSERTAR TITULO AQUI</h1>
         
         <nav class="pestanas">
-            <button class="pestana activa" onclick="cambiarPestana('PLANTS', this)">PLANTS</button>
-            <button class="pestana " onclick="cambiarPestana('DATA', this)">DATA</button>
+            <button class="pestana activa" onclick="cambiarPestana('DATA', this)">DATA</button>
+            <button class="pestana" onclick="cambiarPestana('CONTENEDORES', this)">CONTENEDORES</button>
         </nav>
     </header>
 
     <main>
-        <section id="PLANTS" class="contenido-pestana activa">
-            <h2>insertar titulo plants</h2>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas, voluptate.</p>
-        </section>
-        <section id="DATA" class="contenido-pestana ">
+        <section id="DATA" class="contenido-pestana activa">
            <div class="contenedor-estado">
               <div id="badge-conexion" class="badge connecting">
                   <span class="punto"></span>
@@ -38,17 +34,17 @@
                 <div class="leyenda-sensores">
                     <h3>ESTADO DE SENSORES</h3>
                     <div class="lista-sensores">
-                        <div class="item-sensor" id="item-real">
-                            <span class="nombre-sensor">Sensor 1 (Principal)</span>
-                            <div class="status-pill status-ok" id="status-real">OK</div>
+                        <div class="item-sensor">
+                            <span class="nombre-sensor">Sensor 1 (UPC)</span>
+                            <div class="status-pill status-loading" id="status-real">-</div>
                         </div>
                         <div class="item-sensor">
-                            <span class="nombre-sensor">Sensor 2 (Norte)</span>
-                            <div class="status-pill status-ok">OK</div>
+                            <span class="nombre-sensor">Sensor 2 (Passeig de Gràcia)</span>
+                            <div class="status-pill status-loading" id="status-falso1">-</div>
                         </div>
                         <div class="item-sensor">
-                            <span class="nombre-sensor">Sensor 3 (Invernadero)</span>
-                            <div class="status-pill status-ok">OK</div>
+                            <span class="nombre-sensor">Sensor 3 (Barceloneta beach)</span>
+                            <div class="status-pill status-loading" id="status-falso2">-</div>
                         </div>
                     </div>
                 </div>
@@ -56,7 +52,7 @@
 
             <hr class="separador-seccion">
 
-            <h2 id="titulo-sensor-activo" class="titulo-datos-sensor">SHOWING DATA FROM SENSOR 1 (PRINCIPAL)</h2>
+            <h2 id="titulo-sensor-activo" class="titulo-datos-sensor">SHOWING DATA FROM SENSOR 1</h2>
             
             <div class="contenedor-graficas-doble">
             
@@ -87,6 +83,11 @@
                 </div>
         
             </div>
+        </section>
+
+        <section id="CONTENEDORES" class="contenido-pestana">
+            <h2>insertar titulo contenedores</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas, voluptate.</p>
         </section>
     </main>
 
