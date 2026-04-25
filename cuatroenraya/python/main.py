@@ -1,16 +1,18 @@
 import json
 import os
 import traceback
+import cv2
 
 from arduino.app_utils import App, Bridge
 from arduino.app_bricks.web_ui import WebUI
 from datetime import datetime
 from heat_decision import evaluate_heat_conditions
+from person_detection import detect_person
 
 _ui_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ui")    #Calcula ruta a la carpeta ui
 ui = WebUI(assets_dir_path=_ui_dir)                                               #Crea interfaz web (ui)
 
-state = {"temperature": 0.0, "humidity": 0.0, "time": "", "diffuser_state": 0, "heatwave_alert": False}
+state = {"temperature": 0.0, "humidity": 0.0, "time": "", "diffuser_state": 0, "heatwave_alert": False, "person_detection": False}
 
 def _call_mcu(method, *args):
     try:
@@ -54,6 +56,7 @@ def on_sensor_reading(temperature: float, humidity: float):
             Bridge.call("set_pixel", 0, 0, 0, 0, 0)        #apagado
     
     threading.Thread(target=update_led).start()
+
 
 
 ui.on_connect(on_connect)
