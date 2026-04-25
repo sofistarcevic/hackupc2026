@@ -2,8 +2,10 @@ import requests
 
 MAX_ROUTE_DISTANCE_KM = 8
 
-def meters_to_km(m):
-    return round(m / 1000, 2)
+
+def meters_to_km(meters):
+    return round(meters / 1000, 2)
+
 
 def get_distance_matrix_from_osrm(locations):
     coords = ";".join([f"{loc['lon']},{loc['lat']}" for loc in locations])
@@ -20,17 +22,17 @@ def get_distance_matrix_from_osrm(locations):
 
     matrix = {}
 
-    for i, from_loc in enumerate(locations):
-        matrix[from_loc["id"]] = {}
-        for j, to_loc in enumerate(locations):
-            matrix[from_loc["id"]][to_loc["id"]] = distances[i][j]
+    for i, from_location in enumerate(locations):
+        matrix[from_location["id"]] = {}
+
+        for j, to_location in enumerate(locations):
+            matrix[from_location["id"]][to_location["id"]] = distances[i][j]
 
     return matrix
 
 
-# ALGORITME DE RUTA
-def get_distance(matrix, a, b):
-    return matrix[a][b]
+def get_distance(matrix, from_id, to_id):
+    return matrix[from_id][to_id]
 
 
 def nearest_neighbor(containers, matrix, depot_id):
@@ -39,27 +41,25 @@ def nearest_neighbor(containers, matrix, depot_id):
     current = depot_id
 
     while pending:
-        next_c = min(
+        next_container = min(
             pending,
             key=lambda c: get_distance(matrix, current, c["id"])
         )
-        route.append(next_c)
-        pending.remove(next_c)
-        current = next_c["id"]
+
+        route.append(next_container)
+        pending.remove(next_container)
+        current = next_container["id"]
 
     return route
 
 
 def route_distance(route, matrix, depot_id):
-    if not route:
-        return 0
-
     total = 0
     current = depot_id
 
-    for c in route:
-        total += get_distance(matrix, current, c["id"])
-        current = c["id"]
+    for container in route:
+        total += get_distance(matrix, current, container["id"])
+        current = container["id"]
 
     total += get_distance(matrix, current, depot_id)
 
@@ -68,54 +68,70 @@ def route_distance(route, matrix, depot_id):
 
 def build_route(truck_id, containers, matrix, depot_id):
     route = nearest_neighbor(containers, matrix, depot_id)
-    dist_m = route_distance(route, matrix, depot_id)
+    distance_m = route_distance(route, matrix, depot_id)
 
     return {
         "truck_id": truck_id,
         "route": route,
-        "distance_km": meters_to_km(dist_m)
+        "distance_km": meters_to_km(distance_m)
     }
 
 
-def split_groups(containers, num_trucks):
-    containers = sorted(containers, key=lambda c: c["fill_percent"], reverse=True)
+def split_groups(containers, number_of_trucks):
+    containers = sorted(
+        containers,
+        key=lambda c: c.get("fill_percent", 0),
+        reverse=True
+    )
 
-    groups = [[] for _ in range(num_trucks)]
+    groups = [[] for _ in range(number_of_trucks)]
 
-    for i, c in enumerate(containers):
-        groups[i % num_trucks].append(c)
+    for index, container in enumerate(containers):
+        groups[index % number_of_trucks].append(container)
 
     return groups
 
 
 def optimize_routes_with_osrm(full_containers, trucks, depot):
     if not full_containers:
-        return {"routes": [], "message": "No hi ha contenidors"}
+        return {
+            "routes": [],
+            "message": "No hi ha contenidors per recollir"
+        }
 
     locations = [depot] + full_containers
     matrix = get_distance_matrix_from_osrm(locations)
 
-    # 👉 prova amb 1 camió
-    one = build_route(trucks[0]["id"], full_containers, matrix, depot["id"])
+    one_truck_route = build_route(
+        trucks[0]["id"],
+        full_containers,
+        matrix,
+        depot["id"]
+    )
 
-    if one["distance_km"] <= MAX_ROUTE_DISTANCE_KM:
+    if one_truck_route["distance_km"] <= MAX_ROUTE_DISTANCE_KM:
         return {
-            "routes": [one],
+            "routes": [one_truck_route],
             "message": "1 camió suficient"
         }
 
-    # 👉 dividir
-    num = min(len(trucks), len(full_containers))
-    groups = split_groups(full_containers, num)
+    number_of_trucks = min(len(trucks), len(full_containers))
+    groups = split_groups(full_containers, number_of_trucks)
 
     routes = []
 
-    for i, group in enumerate(groups):
+    for index, group in enumerate(groups):
         if not group:
             continue
 
-        r = build_route(trucks[i]["id"], group, matrix, depot["id"])
-        routes.append(r)
+        routes.append(
+            build_route(
+                trucks[index]["id"],
+                group,
+                matrix,
+                depot["id"]
+            )
+        )
 
     return {
         "routes": routes,
