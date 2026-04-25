@@ -15,7 +15,7 @@ state = {"temperature": 0.0, "humidity": 0.0, "time": "", "diffuser_state": 0, "
 def _call_mcu(method, *args):
     try:
         return json.loads(Bridge.call(method, *args))        #Convierte la respuesta JSON en Python
-    except Exception as e:
+    except Exception as exc:
         print(f"[bridge] {method} error: {exc}")
         return None
 
@@ -41,17 +41,17 @@ def on_sensor_reading(temperature: float, humidity: float):
     state["diffuser_state"] = diffuser_state
     state["heatwave_alert"] = heatwave_alert
 
-    ui.send_message("state_update", state)             #Envía datos a todos los clientes conectados    
+    ui.send_message("state_update", state)          #Envía datos a todos los clientes conectados    
 
     import threading
 
     def update_led():
-        if diffuser_state == 0:
-            Bridge.call("set_pixel", 0, 0, 0, 0, 0)        #apagado
-        elif diffuser_state == 1:
+        if diffuser_state == 1:
             Bridge.call("set_pixel", 0, 255, 255, 0, 50)   #amarillo con brightness medio
         elif diffuser_state == 2:
             Bridge.call("set_pixel", 0, 255, 0, 0, 100)    #rojo con brightness màximo
+        else
+            Bridge.call("set_pixel", 0, 0, 0, 0, 0)        #apagado
     
     threading.Thread(target=update_led).start()
 
