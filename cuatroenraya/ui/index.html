@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
     <header>
@@ -23,39 +25,69 @@
             <h2>insertar titulo plants</h2>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas, voluptate.</p>
         </section>
-
         <section id="DATA" class="contenido-pestana ">
-            <h2 id="estado-conexion">Desconectado</h2>
-            <div class="panel-data-Temperatura">
-                
-                <div class="contenedor-grafica">
-                     <canvas id="graficaTemperatura"></canvas>
-                </div>
-
-                <div class="mustreo-actual">
-                    <h3>DATO ACTUAL</h3>
-                    <div class="valor-gigante">
-                        <span id="temp-actual-display">--</span><span class="unidad">°C</span>
+           <div class="contenedor-estado">
+              <div id="badge-conexion" class="badge connecting">
+                  <span class="punto"></span>
+                  <span id="texto-conexion">CONNECTING...</span>
+              </div>
+            </div>
+            
+            <div class="contenedor-mapa-sistema">
+                <div id="mi-mapa"></div>
+                <div class="leyenda-sensores">
+                    <h3>ESTADO DE SENSORES</h3>
+                    <div class="lista-sensores">
+                        <div class="item-sensor" id="item-real">
+                            <span class="nombre-sensor">Sensor 1 (Principal)</span>
+                            <div class="status-pill status-ok" id="status-real">OK</div>
+                        </div>
+                        <div class="item-sensor">
+                            <span class="nombre-sensor">Sensor 2 (Norte)</span>
+                            <div class="status-pill status-ok">OK</div>
+                        </div>
+                        <div class="item-sensor">
+                            <span class="nombre-sensor">Sensor 3 (Invernadero)</span>
+                            <div class="status-pill status-ok">OK</div>
+                        </div>
                     </div>
                 </div>
-
             </div>
 
-            <div class="panel-data-Humedad">
-                
-                <div class="contenedor-grafica">
-                     <canvas id="graficaHumedad"></canvas>
-                </div>
+            <hr class="separador-seccion">
 
-                <div class="display-actual">
-                    <h3>DATO ACTUAL</h3>
-                    <div class="valor-gigante">
-                        <span id="humedad-actual-display">--</span><span class="unidad">%</span>
+            <h2 id="titulo-sensor-activo" class="titulo-datos-sensor">SHOWING DATA FROM SENSOR 1 (PRINCIPAL)</h2>
+            
+            <div class="contenedor-graficas-doble">
+            
+            <div class="contenedor-graficas-doble">
+                
+                <div class="panel-data-Temperatura">
+                    <div class="contenedor-grafica">
+                         <canvas id="graficaTemperatura"></canvas>
+                    </div>
+                    <div class="mustreo-actual">
+                        <h3>DATO ACTUAL</h3>
+                        <div class="valor-gigante">
+                            <span id="temp-actual-display">--</span><span class="unidad">°C</span>
+                        </div>
                     </div>
                 </div>
-
+        
+                <div class="panel-data-Humedad">
+                    <div class="contenedor-grafica">
+                         <canvas id="graficaHumedad"></canvas>
+                    </div>
+                    <div class="display-actual">
+                        <h3>DATO ACTUAL</h3>
+                        <div class="valor-gigante">
+                            <span id="humedad-actual-display">--</span><span class="unidad">%</span>
+                        </div>
+                    </div>
+                </div>
+        
             </div>
-            </section>
+        </section>
     </main>
 
     <script src="app.js"></script>
