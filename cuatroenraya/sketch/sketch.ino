@@ -4,11 +4,11 @@
 ModulinoThermo thermo;
 ModulinoPixels pixels;
 
-unsigned long last_read_ms = 0;    //último momento en que se leyó el sensor
+unsigned long last_read_ms = 0;                 //último momento en que se leyó el sensor
 const unsigned long READ_INTERVAL_MS = 2000;    //intervalo entre lecturas = 2s
 struct RgbColor { uint8_t r, g, b; };
 
-//led state:
+//estado de los leds:
 uint8_t brightness = 25;  // 0-100
 uint8_t led_r[8] = {0};
 uint8_t led_g[8] = {0};
@@ -16,15 +16,11 @@ uint8_t led_b[8] = {0};
 
 volatile int anim_mode = 0; // 0 = off, 1 = hue wheel, 2 = sweep
 
-String buildState() {
-  float temperature = thermo.getTemperature();    //leemos temperatura
-  float humidity  = thermo.getHumidity();       //leemos humedad
-  return "{\"temperature\": " + String(temperature, 1) +
-         ", \"humidity\": "   + String(humidity,  1) + "}";    //string en formato JSON: {"temperature": x, "humidity": y}
-}
+volatile bool leds_changed = false;
+String last_state_json = "{\"temperature\": 0.0, \"humidity\": 0.0}";
 
 String rpc_get_state() {    //RPC = Remote Procedure Call
-  return buildState();      //devuelve estado actual del sensor en JSON
+  return last_state_json;   //devuelve la memoria caché, sin tocar el sensor
 }
 
 String rpc_set_pixel(int index, int r, int g, int b, int bright) {
@@ -34,8 +30,9 @@ String rpc_set_pixel(int index, int r, int g, int b, int bright) {
   led_r[index] = constrain(r, 0, 255);
   led_g[index] = constrain(g, 0, 255);
   led_b[index] = constrain(b, 0, 255);
-  applyAll();
-  return buildState();
+  
+  leds_changed = true;
+  return last_state_json;
 }
 
 void applyAll() {
@@ -44,6 +41,7 @@ void applyAll() {
   }
   pixels.show();
 }
+
 
 void setup() {
   Bridge.begin();
@@ -56,11 +54,21 @@ void setup() {
 }
 
 void loop() {
-  Bridge.update();
-  
   unsigned long now = millis();    //tiempo desde que arrancó el Arduino
-  if (now - last_read_ms >= READ_INTERVAL_MS) {    //comprueba si han pasado 2s desde la última lectura
+
+  if (leds_changed) {
+    applyAll();
+    leds_changed = false;
+  }
+  
+  if (now - last_read_ms >= READ_INTERVAL_MS) {
     last_read_ms = now;
-    Bridge.notify("sensor_reading", thermo.getTemperature(), thermo.getHumidity());  //manda evento "sensor_reading" con temp y hum
+    
+    float t = thermo.getTemperature();
+    float h = thermo.getHumidity();
+    
+    last_state_json = "{\"temperature\": " + String(t, 1) + ", \"humidity\": " + String(h, 1) + "}";
+    
+    Bridge.notify("sensor_reading", t, h);
   }
 }
