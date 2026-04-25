@@ -1,40 +1,29 @@
-from container_alerts import calculate_fill_percent
-
-
-def build_simulated_container(container_id, name, lat, lon, distance_cm):
-    return {
-        "id": container_id,
-        "name": name,
-        "lat": lat,
-        "lon": lon,
-        "distance_cm": distance_cm,
-        "fill_percent": calculate_fill_percent(distance_cm)
-    }
-
-
 def get_simulated_containers():
     return [
-        build_simulated_container(
-            "C2",
-            "Sants",
-            41.377,
-            2.140,
-            20
-        ),
-        build_simulated_container(
-            "C3",
-            "Gràcia",
-            41.403,
-            2.150,
-            100
-        ),
-        build_simulated_container(
-            "C4",
-            "Barceloneta",
-            41.380,
-            2.189,
-            10
-        )
+        {
+            "id": "C2",
+            "name": "Sants",
+            "zone": 2,
+            "lat": 41.377,
+            "lon": 2.140,
+            "fill_percent": 85
+        },
+        {
+            "id": "C3",
+            "name": "Gràcia",
+            "zone": 2,
+            "lat": 41.403,
+            "lon": 2.150,
+            "fill_percent": 45
+        },
+        {
+            "id": "C4",
+            "name": "Barceloneta",
+            "zone": 3,
+            "lat": 41.380,
+            "lon": 2.189,
+            "fill_percent": 92
+        }
     ]
 
 
