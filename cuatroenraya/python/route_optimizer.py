@@ -1,7 +1,5 @@
 import requests
 
-MAX_ROUTE_DISTANCE_KM = 8
-
 
 def meters_to_km(meters):
     return round(meters / 1000, 2)
@@ -86,78 +84,36 @@ def route_distance(route, matrix, depot_id):
     return total
 
 
-def build_route(truck_id, containers, matrix, depot):
-    route = nearest_neighbor(containers, matrix, depot["id"])
-    distance_m = route_distance(route, matrix, depot["id"])
-
-    points = [depot] + route + [depot]
-    geometry = get_route_geometry_from_osrm(points)
-
-    return {
-        "truck_id": truck_id,
-        "route": route,
-        "distance_km": meters_to_km(distance_m),
-        "geometry": geometry
-    }
-
-
-def split_groups(containers, number_of_trucks):
-    containers = sorted(
-        containers,
-        key=lambda c: c.get("fill_percent", 0),
-        reverse=True
-    )
-
-    groups = [[] for _ in range(number_of_trucks)]
-
-    for index, container in enumerate(containers):
-        groups[index % number_of_trucks].append(container)
-
-    return groups
-
-
-def optimize_routes_with_osrm(full_containers, trucks, depot):
+def optimize_route_with_osrm(full_containers, depot):
     if not full_containers:
         return {
-            "routes": [],
+            "route": [],
+            "distance_km": 0,
+            "geometry": None,
             "message": "No hi ha contenidors per recollir"
         }
 
     locations = [depot] + full_containers
     matrix = get_distance_matrix_from_osrm(locations)
 
-    one_truck_route = build_route(
-        trucks[0]["id"],
+    ordered_route = nearest_neighbor(
         full_containers,
         matrix,
-        depot
+        depot["id"]
     )
 
-    if one_truck_route["distance_km"] <= MAX_ROUTE_DISTANCE_KM:
-        return {
-            "routes": [one_truck_route],
-            "message": "1 camió suficient"
-        }
+    distance_m = route_distance(
+        ordered_route,
+        matrix,
+        depot["id"]
+    )
 
-    number_of_trucks = min(len(trucks), len(full_containers))
-    groups = split_groups(full_containers, number_of_trucks)
-
-    routes = []
-
-    for index, group in enumerate(groups):
-        if not group:
-            continue
-
-        routes.append(
-            build_route(
-                trucks[index]["id"],
-                group,
-                matrix,
-                depot
-            )
-        )
+    points = [depot] + ordered_route + [depot]
+    geometry = get_route_geometry_from_osrm(points)
 
     return {
-        "routes": routes,
-        "message": f"{len(routes)} camions necessaris"
+        "route": ordered_route,
+        "distance_km": meters_to_km(distance_m),
+        "geometry": geometry,
+        "message": "Ruta calculada"
     }
