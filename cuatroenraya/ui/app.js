@@ -71,10 +71,10 @@ function actualizarMapaReciclajeDinamico(contenedores) {
             const marcador = L.marker(posicion)
                 .bindPopup(`
                     <div style="text-align: center;">
-                        <b style="color: #e74c3c;">¡CONTENEDOR LLENO!</b><br>
+                        <b style="color: #e74c3c;">¡FULL CONTAINER!</b><br>
                         <b>${container.name}</b><br>
-                        Llenado: ${container.fill_percent}%<br>
-                        Distancia: ${container.distance_cm}cm
+                        Fill: ${container.fill_percent} %<br>
+                        Distance: ${container.distance_cm} cm
                     </div>
                 `);
             capaMarcadoresBasura.addLayer(marcador);
