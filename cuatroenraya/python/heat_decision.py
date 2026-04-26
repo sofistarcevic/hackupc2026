@@ -27,8 +27,8 @@ def evaluate_heat_conditions(temperature: float, humidity: float):
         diffuser_state = DiffuserState.HIGH.value
 
     #high temperature but humidity moderately high
-    elif temperature >= 32:
-        diffuser_state = DiffuserState.LOW.value
+    #elif temperature >= 32:
+        #diffuser_state = DiffuserState.LOW.value
 
     #warm but not dangerous
     elif temperature >= 30:
