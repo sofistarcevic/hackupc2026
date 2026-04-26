@@ -31,6 +31,26 @@ def get_distance_matrix_from_osrm(locations):
     return matrix
 
 
+def get_route_geometry_from_osrm(points):
+    if len(points) < 2:
+        return None
+
+    coords = ";".join([f"{point['lon']},{point['lat']}" for point in points])
+
+    url = (
+        f"http://router.project-osrm.org/route/v1/driving/"
+        f"{coords}?overview=full&geometries=geojson"
+    )
+
+    response = requests.get(url, timeout=5)
+    data = response.json()
+
+    if data.get("code") != "Ok" or not data.get("routes"):
+        return None
+
+    return data["routes"][0]["geometry"]
+
+
 def get_distance(matrix, from_id, to_id):
     return matrix[from_id][to_id]
 
@@ -66,14 +86,18 @@ def route_distance(route, matrix, depot_id):
     return total
 
 
-def build_route(truck_id, containers, matrix, depot_id):
-    route = nearest_neighbor(containers, matrix, depot_id)
-    distance_m = route_distance(route, matrix, depot_id)
+def build_route(truck_id, containers, matrix, depot):
+    route = nearest_neighbor(containers, matrix, depot["id"])
+    distance_m = route_distance(route, matrix, depot["id"])
+
+    points = [depot] + route + [depot]
+    geometry = get_route_geometry_from_osrm(points)
 
     return {
         "truck_id": truck_id,
         "route": route,
-        "distance_km": meters_to_km(distance_m)
+        "distance_km": meters_to_km(distance_m),
+        "geometry": geometry
     }
 
 
@@ -106,7 +130,7 @@ def optimize_routes_with_osrm(full_containers, trucks, depot):
         trucks[0]["id"],
         full_containers,
         matrix,
-        depot["id"]
+        depot
     )
 
     if one_truck_route["distance_km"] <= MAX_ROUTE_DISTANCE_KM:
@@ -129,7 +153,7 @@ def optimize_routes_with_osrm(full_containers, trucks, depot):
                 trucks[index]["id"],
                 group,
                 matrix,
-                depot["id"]
+                depot
             )
         )
 
