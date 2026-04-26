@@ -1,15 +1,15 @@
-/* --- BASE Y TIPOGRAFÍA --- */
+/*BASE Y TIPOGRAFÍA*/
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f7f6;
     color: #333;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Evita scroll horizontal */
+    overflow-x: hidden;
     overflow-y: scroll;
 }
 
-/* --- HEADER Y NAVEGACIÓN --- */
+/*HEADER Y NAVEGACIÓN*/
 header {
     background-color: #186311;
     color: white;
@@ -43,17 +43,12 @@ h1 {
     transition: all 0.3s ease;
 }
 
-.pestana:hover {
-    background-color: #0b410d;
-    color: white;
-}
-
 .pestana.activa {
     background-color: #f4f7f6; 
     color: #215f24;
 }
 
-/* --- CONTENIDO DE PESTAÑAS --- */
+/*CONTENIDO DE PESTAÑAS*/
 .contenido-pestana {
     display: none !important;
     padding: 40px;
@@ -65,7 +60,7 @@ h1 {
     display: block !important;
 }
 
-/* --- BADGE DE CONEXIÓN --- */
+/*BADGE DE CONEXIÓN*/
 .contenedor-estado {
     display: flex;
     justify-content: center;
@@ -81,31 +76,20 @@ h1 {
     color: white;
     font-size: 0.85rem;
     letter-spacing: 1px;
-    transition: background-color 0.3s ease;
 }
 
 .badge .punto {
-    width: 10px;
-    height: 10px;
+    width: 10px; height: 10px;
     background-color: white;
     border-radius: 50%;
     margin-right: 10px;
 }
 
-.badge.disconnected { background-color: #e74c3c; }
-.badge.connecting { background-color: #95a5a6; }
 .badge.connected { background-color: #2ecc71; }
+.badge.connecting { background-color: #95a5a6; }
+.badge.disconnected { background-color: #e74c3c; }
 
-.badge.connecting .punto {
-    animation: parpadeo 1s infinite alternate;
-}
-
-@keyframes parpadeo {
-    0% { opacity: 0.3; }
-    100% { opacity: 1; }
-}
-
-/* --- MAPA Y LEYENDA (LADO A LADO) --- */
+/*MAPA Y LEYENDA*/
 .contenedor-mapa-sistema {
     display: flex;
     gap: 20px;
@@ -115,97 +99,42 @@ h1 {
 }
 
 #mi-mapa {
-    flex: 2; /* Ocupa 2/3 partes */
+    flex: 2;
     height: 100% !important;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 1;
 }
 
 .leyenda-sensores {
-    flex: 1; /* Ocupa 1/3 parte */
+    flex: 1;
     background: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 20px;
-    display: flex;
-    flex-direction: column;
     text-align: left;
 }
 
-.leyenda-sensores h3 {
-    margin-top: 0;
-    font-size: 0.9rem;
-    color: #186311;
-    border-bottom: 2px solid #f4f7f6;
-    padding-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.lista-sensores {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.item-sensor {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.nombre-sensor {
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-/* Óvalos de estado de la leyenda */
 .status-pill {
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.7rem;
     font-weight: bold;
     color: white;
-    min-width: 70px;
-    text-align: center;
 }
 
 .status-ok { background-color: #2ecc71; }
 .status-warning { background-color: #f1c40f; }
 .status-critical { background-color: #e74c3c; }
-.status-loading { 
-    background-color: #bdc3c7; 
-    color: #7f8c8d; 
-}
 
-/* Filtros para marcadores Leaflet */
+/*Filtros para marcadores*/
 .pin-activo { filter: hue-rotate(120deg) brightness(1.2); }
 .pin-inactivo { filter: grayscale(0.8) opacity(0.6); }
 
-/* --- SECCIÓN DE GRÁFICAS --- */
-.separador-seccion {
-    border: 0;
-    height: 1px;
-    background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.1), rgba(0,0,0,0));
-    margin: 40px 0;
-}
-
-.titulo-datos-sensor {
-    font-size: 1.1rem;
-    color: #186311;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 25px;
-    font-weight: 800;
-}
-
+/*SECCIÓN DE GRÁFICAS*/
 .contenedor-graficas-doble {
     display: flex;
     gap: 20px;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .panel-data-Temperatura,
@@ -214,33 +143,27 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    min-width: 0; /* Permite que las gráficas se achiquen correctamente */
 }
 
-.contenedor-grafica {
+/*Recuadros blancos recuperados*/
+.contenedor-grafica,
+.mustreo-actual,
+.display-actual,
+.indicador-circular-wrap {
     background-color: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    width: 100%;
     box-sizing: border-box;
 }
 
-.mustreo-actual,
-.display-actual {
-    background-color: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    text-align: center;
-    box-sizing: border-box;
+.contenedor-grafica {
+    height: 400px;
 }
 
-.mustreo-actual h3,
-.display-actual h3 {
-    margin: 0 0 10px 0;
-    color: #215f24;
-    font-size: 1rem;
+.contenedor-grafica canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .valor-gigante {
@@ -252,5 +175,159 @@ h1 {
 .valor-gigante .unidad {
     font-size: 1.2rem;
     color: #95a5a6;
-    margin-left: 5px;
+}
+
+/*BOLAS GRANDE*/
+.bola-grande {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0 auto;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    border: 5px solid #fff;
+    overflow: hidden; /* Importante para el recorte de la humedad */
+    position: relative;
+}
+
+/* BOLA TEMPERATURA: Normal (Gradiente fijo) */
+#circulo-temperatura {
+    background: linear-gradient(135deg, #ff5f6d, #ffc371);
+}
+
+/* BOLA HUMEDAD: Efecto tanque (Medio llena/vacia) */
+#circulo-porcentaje {
+    background: #e0e0e0; /* Color del fondo vacío */
+}
+
+#circulo-porcentaje::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--water-fill, 0%); 
+    background: linear-gradient(to top, #2193b0, #6dd5ed);
+    transition: height 1s ease-in-out;
+}
+
+#circulo-porcentaje span, 
+#circulo-porcentaje small {
+    position: relative;
+    z-index: 10;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+.bola-grande small {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/*BOTÓN DE INFORMACIÓN Y DESPLEGABLE*/
+.titulo-con-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.info-icono-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.info-icono {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #2193b0;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    line-height: 18px;
+    font-family: 'serif';
+    transition: background 0.3s;
+}
+
+.info-icono:hover {
+    background-color: #186311;
+}
+
+.info-desplegable {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    
+    top: 50%;
+    left: 30px;
+    transform: translateY(-40%);
+    
+    width: 240px;
+    background-color: white;
+    color: #333;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 100;
+    text-align: left;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+/* Flechita del desplegable */
+.info-desplegable::after {
+    content: "";
+    position: absolute;
+    top: 25%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent white transparent transparent;
+}
+
+.info-icono-wrapper:hover .info-desplegable {
+    visibility: visible;
+    opacity: 1;
+    top: 25px;
+}
+
+.info-desplegable h4 {
+    margin: 0 0 8px 0;
+    color: #186311;
+    font-size: 0.9rem;
+}
+
+.info-desplegable p {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.info-desplegable ul {
+    margin: 8px 0 0 0;
+    padding-left: 15px;
+    font-size: 0.75rem;
+}
+
+.contenedor-mapa-reciclaje {
+    width: 100%;
+    height: 600px;
+    margin-top: 20px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+#mapa-reciclaje {
+    width: 100%;
+    height: 100%;
 }
