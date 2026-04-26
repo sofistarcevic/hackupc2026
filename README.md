@@ -1,3 +1,4 @@
+<img width="1887" height="782" alt="Captura de pantalla 2026-04-26 064708" src="https://github.com/user-attachments/assets/5349fecd-c6ec-466e-a3dd-2c110ea8cfe1" />
 # ECO Pulse (HackUPC 2026)
 
 Adaptive Urban Cooling & Waste Management Platform
@@ -64,11 +65,11 @@ __________________________________________________________
 <img width="4080" height="3060" alt="20260426_060338" src="https://github.com/user-attachments/assets/1471ae1e-d8d8-4f91-b8da-7704b1535980" />
 
 ### Screenshots of the DATA tab:
-<img width="1892" height="857" alt="image" src="https://github.com/user-attachments/assets/6b69686c-cbb3-405b-bbe0-ba41c58a7350" />
+<img width="1887" height="782" alt="Captura de pantalla 2026-04-26 064708" src="https://github.com/user-attachments/assets/a56bbf22-9013-47ac-b940-e9492b108de7" />
 
-<img width="1850" height="807" alt="image" src="https://github.com/user-attachments/assets/535a82e5-5d2e-4b6d-840e-9086035805f8" />
+<img width="1873" height="844" alt="Captura de pantalla 2026-04-26 064626" src="https://github.com/user-attachments/assets/322aea65-1982-46c4-b62e-34a360c673a0" />
 
-<img width="1864" height="580" alt="image" src="https://github.com/user-attachments/assets/762b903d-fa33-4587-80fb-2956570cd9d5" />
+<img width="1864" height="580" alt="Captura de pantalla 2026-04-26 064500" src="https://github.com/user-attachments/assets/1966d421-053d-4557-9ce9-bc56eb35d319" />
 
 ### Screenshot of the RECYCLING tab:
 <img width="1834" height="866" alt="image" src="https://github.com/user-attachments/assets/83f7ac10-f54e-42ec-87b0-e2ebc4f491d9" />
