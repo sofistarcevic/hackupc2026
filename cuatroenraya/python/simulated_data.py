@@ -1,11 +1,9 @@
 EMPTY_DISTANCE_CM = 100
 FULL_DISTANCE_CM = 5
 
-
 def calculate_simulated_fill_percent(distance_cm):
     fill = 100 * (EMPTY_DISTANCE_CM - distance_cm) / (EMPTY_DISTANCE_CM - FULL_DISTANCE_CM)
     return max(0, min(100, round(fill, 1)))
-
 
 def build_simulated_container(container_id, name, lat, lon, distance_cm):
     return {
@@ -16,7 +14,6 @@ def build_simulated_container(container_id, name, lat, lon, distance_cm):
         "distance_cm": distance_cm,
         "fill_percent": calculate_simulated_fill_percent(distance_cm)
     }
-
 
 def get_simulated_containers():
     return [
@@ -43,13 +40,11 @@ def get_simulated_containers():
         )
     ]
 
-
 def get_trucks():
     return [
         {"id": "truck_1"},
         {"id": "truck_2"}
     ]
-
 
 def get_depot():
     return {
