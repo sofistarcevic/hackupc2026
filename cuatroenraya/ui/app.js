@@ -1,4 +1,4 @@
-// --- CONFIGURACIÓN Y ESTADO ---
+// --- CONFIGURACIÓN Y ESTADO GLOBAL ---
 const CONFIG_GRAFICA = (label, color, bgColor) => ({
     type: 'line',
     data: {
@@ -10,24 +10,31 @@ const CONFIG_GRAFICA = (label, color, bgColor) => ({
             backgroundColor: bgColor,
             borderWidth: 2,
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            pointRadius: 0 
         }]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false, 
+        animation: false, 
         plugins: { legend: { position: 'top' } },
-        scales: { y: { suggestedMin: 20, suggestedMax: 45 } }
+        scales: { 
+            y: { min: 0, max: 100 }, 
+            x: { display: false } 
+        }
     }
 });
 
 let sensorSeleccionado = 'real';
-let marcadores = {};
+let marcadores = {}; 
+let contadorMuestras = 0; 
+const MAX_PUNTOS_1H = 720;     
+const MAX_PUNTOS_24H = 1440;   
 
-// --- INICIALIZACIÓN DE GRÁFICAS ---
-// Asegúrate de que estos IDs coincidan con tu HTML: 'graficaTemperatura' y 'graficaHumedad'
-const graficaTemp = new Chart(document.getElementById('graficaTemperatura'), CONFIG_GRAFICA('Temperatura (°C)', '#ce1a1a', 'rgba(95, 33, 33, 0.2)'));
-const graficaHumedad = new Chart(document.getElementById('graficaHumedad'), CONFIG_GRAFICA('Humedad (%)', '#2330a1', 'rgba(40, 42, 160, 0.2)'));
+// --- INICIALIZACIÓN DE GRÁFICAS (Chart.js) ---
+const graficaTemp = new Chart(document.getElementById('graficaTemperatura'), CONFIG_GRAFICA('Temperature (°C)', '#ce1a1a', 'rgba(206, 26, 26, 0.2)'));
+const graficaHumedad = new Chart(document.getElementById('graficaHumedad'), CONFIG_GRAFICA('Humidity (%)', '#2330a1', 'rgba(35, 48, 161, 0.2)'));
 
 const UI = {
     temp: document.getElementById('temp-actual-display'),
@@ -35,222 +42,170 @@ const UI = {
     badge: document.getElementById("badge-conexion"),
     textoBadge: document.getElementById("texto-conexion"),
     tituloSensor: document.getElementById("titulo-sensor-activo"),
-    pillReal: document.getElementById("status-real")
+    pillReal: document.getElementById("status-real"),
+    bolaTemp: document.getElementById('valor-bola-temp'),
+    bolaPorcentaje: document.getElementById('valor-bola-porcentaje'),
+    wrapBolas: document.querySelectorAll('.indicador-circular-wrap'),
+    basura: document.getElementById('basura-actual-display')
 };
 
-// --- DATOS DE SENSORES SIMULADOS ---
+// --- LÓGICA DE RECYCLING (Pines Dinámicos con filtro > 80%) ---
+let mapaBasuras;
+let capaMarcadoresBasura = L.layerGroup(); 
+
+function inicializarMapaReciclaje() {
+    if (mapaBasuras) return;
+    mapaBasuras = L.map('mapa-reciclaje').setView([41.3889, 2.1131], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapaBasuras);
+    capaMarcadoresBasura.addTo(mapaBasuras);
+}
+
+function actualizarMapaReciclajeDinamico(contenedores) {
+    if (!mapaBasuras) return;
+    capaMarcadoresBasura.clearLayers(); // Limpiar mapa
+
+    contenedores.forEach(container => {
+        // DECISIÓN: Solo si el porcentaje es mayor o igual a 80
+        if (container.fill_percent >= 80) {
+            const posicion = [container.lat, container.lon];
+            const marcador = L.marker(posicion)
+                .bindPopup(`
+                    <div style="text-align: center;">
+                        <b style="color: #e74c3c;">¡CONTENEDOR LLENO!</b><br>
+                        <b>${container.name}</b><br>
+                        Llenado: ${container.fill_percent}%<br>
+                        Distancia: ${container.distance_cm}cm
+                    </div>
+                `);
+            capaMarcadoresBasura.addLayer(marcador);
+        }
+    });
+}
+
+// --- LÓGICA DE DATOS REALES (Sensor 1) ---
+function applyState(state) {
+    const t = parseFloat(state.temperature);
+    const h = parseFloat(state.humidity);
+    const horaFull = state.time ? state.time.split('T')[1].split('.')[0] : new Date().toLocaleTimeString().slice(0, 8);
+    const horaCorta = horaFull.slice(0, 5);
+
+    // Actualizar UI si el Sensor 1 está activo
+    if (sensorSeleccionado === 'real') {
+        const estalvi = parseFloat(state.saving_percentage) || 0;
+        const feeling = parseFloat(state.feels_like);
+        if(UI.temp) UI.temp.textContent = t.toFixed(1);
+        if(UI.hum) UI.hum.textContent = h.toFixed(1);
+        if(UI.bolaTemp) UI.bolaTemp.textContent = feeling.toFixed(1);
+        if(UI.bolaPorcentaje) UI.bolaPorcentaje.textContent = estalvi.toFixed(1); 
+        document.getElementById('circulo-porcentaje').style.setProperty('--water-fill', estalvi + '%');
+        updateCharts(t, h, horaFull.slice(3, 8));
+        if (UI.pillReal) actualizarVisualPill("status-real", parseInt(state.diffuser_state));
+    }
+
+    // Actualizar Recycling
+    if (state.trash_level !== undefined && UI.basura) {
+        UI.basura.textContent = parseFloat(state.trash_level).toFixed(1);
+        UI.basura.style.color = parseFloat(state.trash_level) >= 80 ? "#e74c3c" : "#08310a";
+    }
+    if (state.full_containers) {
+        actualizarMapaReciclajeDinamico(state.full_containers);
+    }
+}
+
+// --- SENSORES SIMULADOS Y MAPA PRINCIPAL ---
 const DATOS_SIMULADOS = {
-    'falso1': {
-        nombre: 'Sensor 2 (Norte)',
-        indice: 0,
-        historialTemp: [22.5, 25.0, 28.2, 31.5, 33.0, 34.2, 32.0, 29.5, 26.0, 24.5, 30.5, 33.8],
-        historialHum: [45, 48, 50, 55, 60, 58, 55, 52, 50, 48, 54, 57]
-    },
-    'falso2': {
-        nombre: 'Sensor 3 (Invernadero)',
-        indice: 0,
-        historialTemp: [31.0, 33.5, 35.2, 37.8, 39.5, 36.0, 34.5, 32.0, 35.5, 38.0, 40.2, 33.0],
-        historialHum: [65, 68, 62, 55, 50, 58, 60, 65, 55, 52, 48, 60]
-    }
+    'falso1': { nombre: 'Sensor 2 (P. Gràcia)', indice: 199, historialTemp: Array.from({length: 250}, () => 22 + Math.random() * 10), historialHum: Array.from({length: 250}, () => 40 + Math.random() * 20) },
+    'falso2': { nombre: 'Sensor 3 (Barceloneta)', indice: 199, historialTemp: Array.from({length: 250}, () => 28 + Math.random() * 12), historialHum: Array.from({length: 250}, () => 60 + Math.random() * 25) }
 };
 
-// --- LÓGICA DE DECISIÓN ---
-function evaluarCondicionesCalor(temp, hum) {
-    let diffuser_state = 0; // OFF por defecto
+function seleccionarSensor(id, nombre) {
+    sensorSeleccionado = id;
+    UI.tituloSensor.textContent = `SHOWING DATA FROM ${nombre.toUpperCase()}`;
+    UI.wrapBolas.forEach(el => el.style.display = (id === 'real') ? 'block' : 'none');
 
-    if (temp < 30 || hum > 85) {
-        diffuser_state = 0; // OFF
-    } else if (temp >= 35 && hum <= 70) {
-        diffuser_state = 2; // HIGH
-    } else if (temp >= 32 || temp >= 30) {
-        diffuser_state = 1; // LOW
+    graficaTemp.data.datasets[0].data = []; graficaHumedad.data.datasets[0].data = [];
+    graficaTemp.data.labels = []; graficaHumedad.data.labels = [];
+
+    if (id === 'real') {
+        UI.temp.textContent = "--"; UI.hum.textContent = "--";
+    } else {
+        const d = DATOS_SIMULADOS[id];
+        UI.temp.textContent = d.historialTemp[d.indice].toFixed(1);
+        UI.hum.textContent = d.historialHum[d.indice].toFixed(1);
+        for (let i = 0; i < 200; i++) {
+            let idx = (d.indice - 199 + i + d.historialTemp.length) % d.historialTemp.length;
+            graficaTemp.data.datasets[0].data.push(d.historialTemp[idx]);
+            graficaHumedad.data.datasets[0].data.push(d.historialHum[idx]);
+            graficaTemp.data.labels.push(""); graficaHumedad.data.labels.push("");
+        }
     }
-    
-    return diffuser_state;
+    graficaTemp.update(); graficaHumedad.update();
+    actualizarColorPines(id);
 }
 
-function actualizarVisualPill(elementId, dState) {
-    const pill = document.getElementById(elementId);
-    if (!pill) return;
-
-    const clases = ["status-ok", "status-warning", "status-critical"];
-    const textos = ["OK", "WARNING", "CRITICAL"];
-
-    // Esto sobreescribe "status-loading" por la clase de color que toque
-    pill.className = `status-pill ${clases[dState]}`;
-    pill.textContent = textos[dState];
+function simularPasoTiempo() {
+    Object.keys(DATOS_SIMULADOS).forEach(key => {
+        const sensor = DATOS_SIMULADOS[key];
+        sensor.indice = (sensor.indice + 1) % sensor.historialTemp.length;
+        actualizarVisualPill(`status-${key}`, evaluarCondicionesCalor(sensor.historialTemp[sensor.indice], sensor.historialHum[sensor.indice]));
+        if (sensorSeleccionado === key) {
+            UI.temp.textContent = sensor.historialTemp[sensor.indice].toFixed(1);
+            UI.hum.textContent = sensor.historialHum[sensor.indice].toFixed(1);
+            updateCharts(sensor.historialTemp[sensor.indice], sensor.historialHum[sensor.indice], new Date().toLocaleTimeString().slice(3, 8));
+        }
+    });
 }
 
-// --- FUNCIONES DE INTERFAZ ---
+function updateCharts(t, h, label) {
+    graficaTemp.data.datasets[0].data.push(t); graficaHumedad.data.datasets[0].data.push(h);
+    graficaTemp.data.labels.push(label); graficaHumedad.data.labels.push(label);
+    if (graficaTemp.data.datasets[0].data.length > 200) {
+        graficaTemp.data.datasets[0].data.shift(); graficaHumedad.data.datasets[0].data.shift();
+        graficaTemp.data.labels.shift(); graficaHumedad.data.labels.shift();
+    }
+    graficaTemp.update('none'); graficaHumedad.update('none');
+}
+
+// --- NAVEGACIÓN Y UTILIDADES ---
 function cambiarPestana(idPestana, botonClicado) {
     document.querySelectorAll('.contenido-pestana, .pestana').forEach(el => el.classList.remove('activa'));
     document.getElementById(idPestana).classList.add('activa');
     botonClicado.classList.add('activa');
-
-    if (idPestana === 'DATA') {
-        setTimeout(() => {
-            mapa.invalidateSize();
-        }, 200);
-    }
+    if (idPestana === 'DATA') setTimeout(() => mapa.invalidateSize(), 200);
+    if (idPestana === 'RECYCLING') setTimeout(() => { inicializarMapaReciclaje(); mapaBasuras.invalidateSize(); }, 200);
 }
 
-function actualizarEstadoConexion(clase, texto) {
-    if (!UI.badge) return;
-    UI.badge.className = `badge ${clase}`; 
-    UI.textoBadge.textContent = texto;
+function evaluarCondicionesCalor(temp, hum) {
+    if (temp < 30 || hum > 85) return 0;
+    if (temp >= 35 && hum <= 70) return 2;
+    return 1;
 }
 
-// --- LÓGICA DE ACTUALIZACIÓN DE GRÁFICAS ---
-function updateCharts(t, h, label) {
-    // Referencia directa a los datasets de cada objeto Chart
-    const datasetTemp = graficaTemp.data.datasets[0].data;
-    const datasetHum = graficaHumedad.data.datasets[0].data;
-    
-    // Añadimos datos
-    datasetTemp.push(t);
-    datasetHum.push(h);
-    
-    // Añadimos etiquetas (el tiempo) a AMBAS gráficas
-    graficaTemp.data.labels.push(label);
-    graficaHumedad.data.labels.push(label);
-
-    // Mantenemos solo los últimos 10 puntos
-    if (datasetTemp.length > 10) {
-        datasetTemp.shift();
-        datasetHum.shift();
-        graficaTemp.data.labels.shift();
-        graficaHumedad.data.labels.shift();
-    }
-
-    // Renderizamos los cambios
-    graficaTemp.update();
-    graficaHumedad.update();
+function actualizarVisualPill(elementId, dState) {
+    const pill = document.getElementById(elementId); if (!pill) return;
+    const clases = ["status-ok", "status-warning", "status-critical"];
+    const textos = ["OK", "WARNING", "CRITICAL"];
+    pill.className = `status-pill ${clases[dState] || 'status-ok'}`;
+    pill.textContent = textos[dState] || 'OK';
 }
-
-// --- SIMULADOR DE MOVIMIENTO (RECORRE LA LISTA) ---
-function simularPasoTiempo() {
-    Object.keys(DATOS_SIMULADOS).forEach(key => {
-        const sensor = DATOS_SIMULADOS[key];
-        
-        sensor.indice++;
-        if (sensor.indice >= sensor.historialTemp.length) {
-            sensor.indice = 0;
-        }
-
-        const tActual = sensor.historialTemp[sensor.indice];
-        const hActual = sensor.historialHum[sensor.indice];
-
-        // 1. Calculamos el estado según la lógica de calor
-        const nuevoEstado = evaluarCondicionesCalor(tActual, hActual);
-
-        // 2. Actualizamos el óvalo en la leyenda (siempre, aunque no esté seleccionado)
-        actualizarVisualPill(`status-${key}`, nuevoEstado);
-
-        // 3. Si el usuario tiene seleccionado este sensor, actualizar gráficas y displays
-        if (sensorSeleccionado === key) {
-            UI.temp.textContent = tActual.toFixed(1);
-            UI.hum.textContent = hActual.toFixed(1);
-            const etiquetaHora = new Date().toLocaleTimeString().slice(3, 8); 
-            updateCharts(tActual, hActual, etiquetaHora);
-        }
-    });
-}
-
-// Ejecutar simulador cada 3 segundos
-setInterval(simularPasoTiempo, 3000);
-
-// --- LÓGICA DE SOCKET (SENSOR REAL) ---
-function applyState(state) {
-    if (sensorSeleccionado !== 'real') return; 
-
-    const t = parseFloat(state.temperature);
-    const h = parseFloat(state.humidity);
-    const hora = state.time ? state.time.split('T')[1].split('.')[0] : "--:--";
-
-    if(UI.temp) UI.temp.textContent = t.toFixed(1);
-    if(UI.hum) UI.hum.textContent = h.toFixed(1);
-
-    updateCharts(t, h, hora);
-
-    if (UI.pillReal) {
-        const dState = parseInt(state.diffuser_state);
-        const clases = ["status-", "status-ok", "status-warning", "status-critical"];
-        const textos = ["-", "OK", "WARNING", "CRITICAL"];
-        
-        UI.pillReal.className = `status-pill ${clases[dState] || 'status-ok'}`;
-        UI.pillReal.textContent = textos[dState] || 'OK';
-    }
-}
-
-// --- MAPA ---
-let mapa = L.map('mi-mapa').setView([41.38863075905344, 2.149742538416078], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapa);
-
-marcadores.real = L.marker([41.38895072885124, 2.113178963447162]).addTo(mapa).bindPopup("Sensor 1 (UPC)");
-marcadores.falso1 = L.marker([41.396528370927946, 2.1598679960877663]).addTo(mapa).bindPopup("Sensor 2 (Passeig de Gràcia)");
-marcadores.falso2 = L.marker([41.37781823573754, 2.1920909114293217]).addTo(mapa).bindPopup("Sensor 3 (Barceloneta beach)");
-
-function seleccionarSensor(id, nombre) {
-    sensorSeleccionado = id;
-    if(UI.tituloSensor) UI.tituloSensor.textContent = `SHOWING DATA FROM ${nombre.toUpperCase()}`;
-
-    // Limpiar gráficas
-    graficaTemp.data.datasets[0].data = [];
-    graficaHumedad.data.datasets[0].data = [];
-    graficaTemp.data.labels = [];
-    graficaHumedad.data.labels = [];
-
-    if (id === 'real') {
-        UI.temp.textContent = "--";
-        UI.hum.textContent = "--";
-        // Al ser real, no llenamos nada, esperamos al socket
-    } else {
-        const datosSim = DATOS_SIMULADOS[id];
-        
-        // CORRECCIÓN: Accedemos al valor actual usando el índice del simulador
-        const tActual = datosSim.historialTemp[datosSim.indice];
-        const hActual = datosSim.historialHum[datosSim.indice];
-
-        UI.temp.textContent = tActual.toFixed(1);
-        UI.hum.textContent = hActual.toFixed(1);
-
-        // Llenamos la gráfica con el historial que tenemos
-        datosSim.historialTemp.forEach((val, i) => {
-            graficaTemp.data.datasets[0].data.push(val);
-            graficaTemp.data.labels.push(`T-${10-i}`);
-        });
-        datosSim.historialHum.forEach((val, i) => {
-            graficaHumedad.data.datasets[0].data.push(val);
-            graficaHumedad.data.labels.push(`T-${10-i}`);
-        });
-    }
-
-    graficaTemp.update();
-    graficaHumedad.update();
-    actualizarColorPines(id);
-}
-
 
 function actualizarColorPines(idActivo) {
     Object.keys(marcadores).forEach(key => {
         const icono = marcadores[key]._icon;
-        if (icono) {
-            icono.classList.toggle('pin-activo', key === idActivo);
-            icono.classList.toggle('pin-inactivo', key !== idActivo);
-        }
+        if (icono) { icono.classList.toggle('pin-activo', key === idActivo); icono.classList.toggle('pin-inactivo', key !== idActivo); }
     });
 }
 
-// --- LISTENERS Y CONEXIÓN ---
-marcadores.real.on('click', () => seleccionarSensor('real', 'Sensor 1 (UPC)'));
-marcadores.falso1.on('click', () => seleccionarSensor('falso1', 'Sensor 2 (Passeig de Gràcia)'));
-marcadores.falso2.on('click', () => seleccionarSensor('falso2', 'Sensor 3 (Barceloneta beach)'));
+// Inicialización Mapa Principal
+let mapa = L.map('mi-mapa').setView([41.3886, 2.1497], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapa);
+marcadores.real = L.marker([41.3889, 2.1131]).addTo(mapa).on('click', () => seleccionarSensor('real', 'Sensor 1 (UPC)'));
+marcadores.falso1 = L.marker([41.3965, 2.1598]).addTo(mapa).on('click', () => seleccionarSensor('falso1', 'Sensor 2 (P. Gràcia)'));
+marcadores.falso2 = L.marker([41.3778, 2.1920]).addTo(mapa).on('click', () => seleccionarSensor('falso2', 'Sensor 3 (Barceloneta)'));
 
+// Socket y Tiempos
+setInterval(simularPasoTiempo, 3000); 
 var socket = io();
-socket.on("connect", () => actualizarEstadoConexion('connected', 'CONNECTED'));
-socket.on("disconnect", () => actualizarEstadoConexion('disconnected', 'DISCONNECTED'));
-socket.io.on("reconnect_attempt", () => actualizarEstadoConexion('connecting', 'CONNECTING...'));
+socket.on("connect", () => { if (UI.badge) { UI.badge.className = "badge connected"; UI.textoBadge.textContent = "CONNECTED"; } });
 socket.on("state_update", applyState);
-
-//Iluminar pin inicial
 setTimeout(() => actualizarColorPines('real'), 600);
