@@ -1,4 +1,4 @@
-# ECHOpulse (HackUPC 2026)
+# ECO Pulse (HackUPC 2026)
 
 Adaptive Urban Cooling & Waste Management Platform
 
