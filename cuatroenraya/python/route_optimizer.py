@@ -1,14 +1,8 @@
 import requests
 import math
 
-
 def meters_to_km(meters):
     return round(meters / 1000, 2)
-
-
-# ---------------------------
-# 🔵 OSRM (RUTES REALS)
-# ---------------------------
 
 def get_distance_matrix_from_osrm(locations):
     coords = ";".join([f"{loc['lon']},{loc['lat']}" for loc in locations])
@@ -33,7 +27,6 @@ def get_distance_matrix_from_osrm(locations):
 
     return matrix
 
-
 def get_route_geometry_from_osrm(points):
     if len(points) < 2:
         return None
@@ -53,10 +46,8 @@ def get_route_geometry_from_osrm(points):
 
     return data["routes"][0]["geometry"]
 
-
 def get_distance(matrix, from_id, to_id):
     return matrix[from_id][to_id]
-
 
 def nearest_neighbor(containers, matrix, depot_id):
     pending = containers.copy()
@@ -75,7 +66,6 @@ def nearest_neighbor(containers, matrix, depot_id):
 
     return route
 
-
 def route_distance(route, matrix, depot_id):
     total = 0
     current = depot_id
@@ -88,17 +78,11 @@ def route_distance(route, matrix, depot_id):
 
     return total
 
-
-# ---------------------------
-# 🔴 FALLBACK LOCAL (SIN INTERNET)
-# ---------------------------
-
 def distance(a, b):
     return math.sqrt(
         (a["lat"] - b["lat"])**2 +
         (a["lon"] - b["lon"])**2
     )
-
 
 def nearest_neighbor_simple(containers, depot):
     pending = containers.copy()
@@ -117,7 +101,6 @@ def nearest_neighbor_simple(containers, depot):
 
     return route
 
-
 def route_distance_simple(route, depot):
     total = 0
     current = depot
@@ -129,11 +112,6 @@ def route_distance_simple(route, depot):
     total += distance(current, depot)
     return total
 
-
-# ---------------------------
-# 🧠 FUNCIÓ PRINCIPAL
-# ---------------------------
-
 def optimize_route(full_containers, depot):
     if not full_containers:
         return {
@@ -144,7 +122,6 @@ def optimize_route(full_containers, depot):
         }
 
     try:
-        # 🔵 Intentem OSRM
         locations = [depot] + full_containers
         matrix = get_distance_matrix_from_osrm(locations)
 
@@ -171,9 +148,8 @@ def optimize_route(full_containers, depot):
         }
 
     except Exception as e:
-        print("⚠️ OSRM ha fallat → fallback local:", e)
+        print("OSRM ha fallat → fallback local:", e)
 
-        # 🔴 fallback local
         route = nearest_neighbor_simple(full_containers, depot)
         dist = route_distance_simple(route, depot)
 
