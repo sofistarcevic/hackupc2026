@@ -68,7 +68,7 @@ __________________________________________________________
 
 <img width="1850" height="807" alt="image" src="https://github.com/user-attachments/assets/535a82e5-5d2e-4b6d-840e-9086035805f8" />
 
-<img width="1844" height="649" alt="image" src="https://github.com/user-attachments/assets/6f8e0065-059c-4c73-8d58-c2922057ec73" />
+<img width="1864" height="580" alt="image" src="https://github.com/user-attachments/assets/762b903d-fa33-4587-80fb-2956570cd9d5" />
 
 ### Screenshot of the RECYCLING tab:
 <img width="1834" height="866" alt="image" src="https://github.com/user-attachments/assets/83f7ac10-f54e-42ec-87b0-e2ebc4f491d9" />
