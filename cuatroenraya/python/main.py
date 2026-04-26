@@ -159,7 +159,12 @@ def on_sensor_reading(temperature: float, humidity: float, dist_mm: int, in_rang
         alivio = alivio * 0.2 # Reducimos el efecto del agua al 20%
 
     #cálculo sensación térmica
-    feels_like = (temperature + (0.55 * (humidity / 100) * (temperature - 14.5))) - alivio
+    feels_like = temperature
+
+    if temperature >= 26.0:
+        feels_like += (0.55 * (humidity / 100) * (temperature - 14.5))
+
+    feels_like -= alivio
 
     state["feels_like"] = round(feels_like, 1)
 
