@@ -1,4 +1,3 @@
-<img width="1887" height="782" alt="Captura de pantalla 2026-04-26 064708" src="https://github.com/user-attachments/assets/5349fecd-c6ec-466e-a3dd-2c110ea8cfe1" />
 # ECO Pulse (HackUPC 2026)
 
 Adaptive Urban Cooling & Waste Management Platform
