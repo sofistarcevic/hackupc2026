@@ -20,17 +20,14 @@
             </nav>
         </div>
     </header>
-
     <main>
         <section id="DATA" class="contenido-pestana activa">
-            
             <div class="contenedor-estado">
                 <div id="badge-conexion" class="badge connecting">
                     <span class="punto"></span>
                     <span id="texto-conexion">CONNECTING...</span>
                 </div>
             </div>
-            
             <div class="contenedor-mapa-sistema">
                 <div id="mi-mapa"></div>
                 <div class="leyenda-sensores">
@@ -51,13 +48,9 @@
                     </div>
                 </div>
             </div>
-
             <hr class="separador-seccion">
-
             <h2 id="titulo-sensor-activo" class="titulo-datos-sensor">SHOWING DATA FROM SENSOR 1</h2>
-            
             <div class="contenedor-graficas-doble">
-                
                 <div class="panel-data-Temperatura">
                     <div class="contenedor-grafica">
                          <canvas id="graficaTemperatura"></canvas>
@@ -68,7 +61,6 @@
                             <span id="temp-actual-display">--</span><span class="unidad">°C</span>
                         </div>
                     </div>
-                    
                     <div class="indicador-circular-wrap">
                         <h3>TERMICAL FEELING</h3>
                         <div class="bola-grande" id="circulo-temperatura">
@@ -76,7 +68,6 @@
                         </div>
                     </div>
                 </div>
-        
                 <div class="panel-data-Humedad">
                     <div class="contenedor-grafica">
                          <canvas id="graficaHumedad"></canvas>
@@ -87,7 +78,6 @@
                             <span id="humedad-actual-display">--</span><span class="unidad">%</span>
                         </div>
                     </div>
-
                     <div class="indicador-circular-wrap">
                         <div class="titulo-con-info">
                             <h3>SAVINGS PERCENTAGE</h3>
@@ -104,18 +94,15 @@
                         </div>
                     </div>
                 </div>
-
             </div> 
         </section>
         <section id="RECYCLING" class="contenido-pestana">
-            <h2>RECYCLING COLLECTION ROUTE</h2>
-            
+            <h2>RECYCLING COLLECTION</h2>
             <div class="contenedor-mapa-reciclaje">
                 <div id="mapa-reciclaje"></div>
             </div>
         </section>
     </main>
-
     <script src="app.js"></script>
 </body>
 </html>
