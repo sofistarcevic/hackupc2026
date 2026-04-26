@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuatro en Raya</title>
+    <title>Cuatro en Raya - Smart Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -12,38 +12,40 @@
 </head>
 <body>
     <header>
-        <h1>INSERTAR TITULO AQUI</h1>
-        
-        <nav class="pestanas">
-            <button class="pestana activa" onclick="cambiarPestana('DATA', this)">DATA</button>
-            <button class="pestana" onclick="cambiarPestana('CONTENEDORES', this)">CONTENEDORES</button>
-        </nav>
+        <div class="header-content">
+            <h1>SMART DETECTION SYSTEM</h1>
+            <nav class="pestanas">
+                <button class="pestana activa" onclick="cambiarPestana('DATA', this)">DATA</button>
+                <button class="pestana" onclick="cambiarPestana('RECYCLING', this)">RECYCLING</button>
+            </nav>
+        </div>
     </header>
 
     <main>
         <section id="DATA" class="contenido-pestana activa">
-           <div class="contenedor-estado">
-              <div id="badge-conexion" class="badge connecting">
-                  <span class="punto"></span>
-                  <span id="texto-conexion">CONNECTING...</span>
-              </div>
+            
+            <div class="contenedor-estado">
+                <div id="badge-conexion" class="badge connecting">
+                    <span class="punto"></span>
+                    <span id="texto-conexion">CONNECTING...</span>
+                </div>
             </div>
             
             <div class="contenedor-mapa-sistema">
                 <div id="mi-mapa"></div>
                 <div class="leyenda-sensores">
-                    <h3>ESTADO DE SENSORES</h3>
+                    <h3>SENSORS STATUS</h3>
                     <div class="lista-sensores">
                         <div class="item-sensor">
                             <span class="nombre-sensor">Sensor 1 (UPC)</span>
                             <div class="status-pill status-loading" id="status-real">-</div>
                         </div>
                         <div class="item-sensor">
-                            <span class="nombre-sensor">Sensor 2 (Passeig de Gràcia)</span>
+                            <span class="nombre-sensor">Sensor 2 (P. Gràcia)</span>
                             <div class="status-pill status-loading" id="status-falso1">-</div>
                         </div>
                         <div class="item-sensor">
-                            <span class="nombre-sensor">Sensor 3 (Barceloneta beach)</span>
+                            <span class="nombre-sensor">Sensor 3 (Barceloneta)</span>
                             <div class="status-pill status-loading" id="status-falso2">-</div>
                         </div>
                     </div>
@@ -55,17 +57,22 @@
             <h2 id="titulo-sensor-activo" class="titulo-datos-sensor">SHOWING DATA FROM SENSOR 1</h2>
             
             <div class="contenedor-graficas-doble">
-            
-            <div class="contenedor-graficas-doble">
                 
                 <div class="panel-data-Temperatura">
                     <div class="contenedor-grafica">
                          <canvas id="graficaTemperatura"></canvas>
                     </div>
                     <div class="mustreo-actual">
-                        <h3>DATO ACTUAL</h3>
+                        <h3>ACTUAL DATA</h3>
                         <div class="valor-gigante">
                             <span id="temp-actual-display">--</span><span class="unidad">°C</span>
+                        </div>
+                    </div>
+                    
+                    <div class="indicador-circular-wrap">
+                        <h3>TERMICAL FEELING</h3>
+                        <div class="bola-grande" id="circulo-temperatura">
+                            <span id="valor-bola-temp">--</span><small>°C</small>
                         </div>
                     </div>
                 </div>
@@ -75,19 +82,37 @@
                          <canvas id="graficaHumedad"></canvas>
                     </div>
                     <div class="display-actual">
-                        <h3>DATO ACTUAL</h3>
+                        <h3>ACTUAL DATA</h3>
                         <div class="valor-gigante">
                             <span id="humedad-actual-display">--</span><span class="unidad">%</span>
                         </div>
                     </div>
-                </div>
-        
-            </div>
-        </section>
 
-        <section id="CONTENEDORES" class="contenido-pestana">
-            <h2>insertar titulo contenedores</h2>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas, voluptate.</p>
+                    <div class="indicador-circular-wrap">
+                        <div class="titulo-con-info">
+                            <h3>SAVINGS PERCENTAGE</h3>
+                            <div class="info-icono-wrapper">
+                                <span class="info-icono">i</span>
+                                <div class="info-desplegable">
+                                    <h4>Savings Percentage</h4>
+                                    <p>This value indicates how much water is being saved thanks to the intelligent management of the diffuser based on temperature and detection of people.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bola-grande" id="circulo-porcentaje">
+                            <span id="valor-bola-porcentaje">--</span><small>%</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div> 
+        </section>
+        <section id="RECYCLING" class="contenido-pestana">
+            <h2>RECYCLING COLLECTION ROUTE</h2>
+            
+            <div class="contenedor-mapa-reciclaje">
+                <div id="mapa-reciclaje"></div>
+            </div>
         </section>
     </main>
 
