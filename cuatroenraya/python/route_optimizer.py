@@ -1,9 +1,14 @@
 import requests
+import math
 
 
 def meters_to_km(meters):
     return round(meters / 1000, 2)
 
+
+# ---------------------------
+# 🔵 OSRM (RUTES REALS)
+# ---------------------------
 
 def get_distance_matrix_from_osrm(locations):
     coords = ";".join([f"{loc['lon']},{loc['lat']}" for loc in locations])
@@ -84,36 +89,97 @@ def route_distance(route, matrix, depot_id):
     return total
 
 
-def optimize_route_with_osrm(full_containers, depot):
+# ---------------------------
+# 🔴 FALLBACK LOCAL (SIN INTERNET)
+# ---------------------------
+
+def distance(a, b):
+    return math.sqrt(
+        (a["lat"] - b["lat"])**2 +
+        (a["lon"] - b["lon"])**2
+    )
+
+
+def nearest_neighbor_simple(containers, depot):
+    pending = containers.copy()
+    route = []
+    current = depot
+
+    while pending:
+        next_container = min(
+            pending,
+            key=lambda c: distance(current, c)
+        )
+
+        route.append(next_container)
+        pending.remove(next_container)
+        current = next_container
+
+    return route
+
+
+def route_distance_simple(route, depot):
+    total = 0
+    current = depot
+
+    for c in route:
+        total += distance(current, c)
+        current = c
+
+    total += distance(current, depot)
+    return total
+
+
+# ---------------------------
+# 🧠 FUNCIÓ PRINCIPAL
+# ---------------------------
+
+def optimize_route(full_containers, depot):
     if not full_containers:
         return {
             "route": [],
             "distance_km": 0,
             "geometry": None,
-            "message": "No hi ha contenidors per recollir"
+            "message": "No hi ha contenidors"
         }
 
-    locations = [depot] + full_containers
-    matrix = get_distance_matrix_from_osrm(locations)
+    try:
+        # 🔵 Intentem OSRM
+        locations = [depot] + full_containers
+        matrix = get_distance_matrix_from_osrm(locations)
 
-    ordered_route = nearest_neighbor(
-        full_containers,
-        matrix,
-        depot["id"]
-    )
+        ordered_route = nearest_neighbor(
+            full_containers,
+            matrix,
+            depot["id"]
+        )
 
-    distance_m = route_distance(
-        ordered_route,
-        matrix,
-        depot["id"]
-    )
+        distance_m = route_distance(
+            ordered_route,
+            matrix,
+            depot["id"]
+        )
 
-    points = [depot] + ordered_route + [depot]
-    geometry = get_route_geometry_from_osrm(points)
+        points = [depot] + ordered_route + [depot]
+        geometry = get_route_geometry_from_osrm(points)
 
-    return {
-        "route": ordered_route,
-        "distance_km": meters_to_km(distance_m),
-        "geometry": geometry,
-        "message": "Ruta calculada"
-    }
+        return {
+            "route": ordered_route,
+            "distance_km": meters_to_km(distance_m),
+            "geometry": geometry,
+            "message": "Ruta real (OSRM)"
+        }
+
+    except Exception as e:
+        print("⚠️ OSRM ha fallat → fallback local:", e)
+
+        # 🔴 fallback local
+        route = nearest_neighbor_simple(full_containers, depot)
+        dist = route_distance_simple(route, depot)
+
+        return {
+            "route": route,
+            "distance_km": round(dist, 4),
+            "geometry": None,
+            "message": "Ruta simple (fallback)"
+        }
